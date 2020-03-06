@@ -5,6 +5,10 @@
 
 trigger:
 - master
+stages:
+- stage: Build
+  jobs:
+  - job: Build
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -20,3 +24,16 @@ steps:
     publishJUnitResults: true
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
     goals: 'package'
+- stage: Deploy
+  jobs:
+  - job: Deploy
+    pool:
+      name: Hosted VS2017
+    steps:
+- task: AzureRmWebAppDeployment@4
+  inputs:
+    ConnectionType: 'AzureRM'
+    azureSubscription: 'Free Trial(5a80f309-bce3-40a7-9022-98f895cad7a4)'
+    appType: 'webAppLinux'
+    WebAppName: 'pul-yaml-johndoeabhishek'
+    packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
